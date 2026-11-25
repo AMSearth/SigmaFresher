@@ -9,6 +9,9 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
+from apps.accounts.models import User
+from apps.resumes.models import Resume
+
 logger = structlog.get_logger(__name__)
 
 MAX_CSP_REPORT_BYTES = 16 * 1024
@@ -39,11 +42,16 @@ def csp_report(request: HttpRequest) -> HttpResponse:
 @require_GET
 def dashboard(request: HttpRequest) -> HttpResponse:
     """Authenticated job seeker dashboard (protected by LoginRequiredMiddleware)."""
+    assert isinstance(request.user, User)
     profile = getattr(request.user, "profile", None)
+    resumes_qs = Resume.objects.filter(user=request.user)
+    active_resume = resumes_qs.filter(is_active=True).first()
     return render(
         request,
         "core/dashboard.html",
         {
             "profile": profile,
+            "active_resume": active_resume,
+            "resume_count": resumes_qs.count(),
         },
     )

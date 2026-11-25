@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}My Resumes — SigmaFresher{% endblock %}
+
+{% block content %}
+<div class="grid-2">
+  <div class="card">
+    <h1>Upload Resume ({{ resumes|length }} / {{ max_resumes }})</h1>
+    <p class="muted">Upload PDF or DOCX resumes up to 5 MB. Contact PII is redacted before Cloud AI skill extraction.</p>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-error">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" action="{% url 'resumes:list' %}" class="mt-1">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            <div class="alert alert-error">{{ field.errors }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary w-full">Upload & Parse Resume</button>
+    </form>
+  </div>
+
+  <div>
+    <h2>Uploaded Resumes</h2>
+    {% for resume in resumes %}
+      {% include "resumes/partials/resume_card.html" with resume=resume %}
+    {% empty %}
+      <div class="card">
+        <p class="muted">No resumes uploaded yet.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

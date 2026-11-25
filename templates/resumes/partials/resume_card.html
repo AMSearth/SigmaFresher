@@ -1,0 +1,55 @@
+<div class="card mt-1" id="resume-{{ resume.pk }}"
+     {% if resume.parse_status == 'pending' or resume.parse_status == 'processing' %}
+     hx-get="{% url 'resumes:status' resume.pk %}"
+     hx-trigger="every 2s"
+     hx-swap="outerHTML"
+     {% endif %}>
+  <div class="flex-between">
+    <div>
+      <strong>{{ resume.label|default:resume.original_filename }}</strong>
+      <div class="muted">{{ resume.original_filename }} &middot; {{ resume.file_extension|upper }}</div>
+    </div>
+    <div class="flex-gap">
+      {% if resume.is_active %}
+        <span class="badge badge-success">Active</span>
+      {% endif %}
+      {% if resume.parse_status == 'ready' %}
+        <span class="badge badge-success">Ready</span>
+      {% elif resume.parse_status == 'failed' %}
+        <span class="badge badge-danger">Failed</span>
+      {% else %}
+        <span class="badge badge-warn">{{ resume.get_parse_status_display }}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if resume.error_message %}
+    <div class="alert alert-error mt-1">{{ resume.error_message }}</div>
+  {% endif %}
+
+  {% if resume.skills %}
+    <div class="chips">
+      {% for skill in resume.skills|slice:":10" %}
+        <span class="chip">{{ skill }}</span>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="flex-gap mt-1">
+    {% if not resume.is_active %}
+      <form method="post" action="{% url 'resumes:activate' resume.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline btn-sm">Set Active</button>
+      </form>
+    {% endif %}
+    <a class="btn btn-outline btn-sm" href="{% url 'resumes:download' resume.pk %}">Download</a>
+    <form method="post" action="{% url 'resumes:reparse' resume.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline btn-sm">Re-parse</button>
+    </form>
+    <form method="post" action="{% url 'resumes:delete' resume.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+    </form>
+  </div>
+</div>

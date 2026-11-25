@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     # Local apps
     "apps.core",
     "apps.accounts",
+    "apps.resumes",
 ]
 
 SITE_ID = 1
@@ -220,6 +221,7 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 
 # Cloud LLM & Discovery Config
+EMBEDDING_DIMENSIONS = 768
 LLM_PROVIDER = env("LLM_PROVIDER", default="openai")
 OPENAI_API_KEY = env("OPENAI_API_KEY", default="")
 OPENAI_MODEL = env("OPENAI_MODEL", default="gpt-4o-mini")
@@ -227,6 +229,10 @@ OPENAI_EMBEDDING_MODEL = env("OPENAI_EMBEDDING_MODEL", default="text-embedding-3
 GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
 GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-2.5-flash")
 GEMINI_EMBEDDING_MODEL = env("GEMINI_EMBEDDING_MODEL", default="text-embedding-004")
+
+MAX_RESUMES_PER_USER = 5
+MAX_RESUME_UPLOAD_BYTES = 5 * 1024 * 1024
+MAX_DOCX_UNCOMPRESSED_BYTES = 25 * 1024 * 1024
 
 ADZUNA_APP_ID = env("ADZUNA_APP_ID", default="")
 ADZUNA_APP_KEY = env("ADZUNA_APP_KEY", default="")

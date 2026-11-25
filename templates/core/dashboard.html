@@ -5,19 +5,54 @@
 {% block content %}
 <div class="card">
   <h1>Welcome, {{ user.full_name|default:user.email }}</h1>
-  <p class="muted">
-    Your authenticated workspace is active. Upload your resume to unlock personalized matching across company career sites and job platforms.
-  </p>
+  {% if not active_resume %}
+    <div class="alert mt-1">
+      <strong>Get Started:</strong> Upload your resume (PDF or DOCX) to extract your skills and unlock personalized matching across company sites and job platforms.
+      <div class="mt-1">
+        <a class="btn btn-primary" href="{% url 'resumes:list' %}">Upload Your First Resume</a>
+      </div>
+    </div>
+  {% else %}
+    <p class="muted">
+      Active resume: <strong>{{ active_resume.label|default:active_resume.original_filename }}</strong>
+      ({{ active_resume.get_parse_status_display }}) &middot; {{ resume_count }} uploaded
+    </p>
+    <div class="flex-gap mt-1">
+      <a class="btn btn-primary" href="{% url 'resumes:list' %}">Manage Resumes</a>
+      <a class="btn btn-outline" href="{% url 'accounts:profile' %}">Edit Search Preferences</a>
+    </div>
+  {% endif %}
 </div>
 
-<div class="grid-2" style="margin-top: 1.25rem;">
+<div class="grid-2 mt-1">
   <div class="card">
-    <h2>1. Upload Your Resume</h2>
-    <p class="muted">PDF or DOCX up to 5 MB. Private encrypted storage with AI skill extraction (Phase 2).</p>
+    <h2>1. Resume Profile & Skills</h2>
+    {% if active_resume and active_resume.skills %}
+      <p class="muted">Extracted skills from your active resume:</p>
+      <div class="chips">
+        {% for skill in active_resume.skills|slice:":12" %}
+          <span class="chip">{{ skill }}</span>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">Upload a PDF or DOCX resume (max 5 MB) to extract skills, target roles, and embeddings.</p>
+    {% endif %}
   </div>
   <div class="card">
-    <h2>2. Search Latest Web Jobs</h2>
-    <p class="muted">Direct company ATS boards, Adzuna, and open-web listings with direct apply links and filters (Phase 3–4).</p>
+    <h2>2. Preferences & Target Roles</h2>
+    {% if profile and profile.target_roles %}
+      <div class="chips">
+        {% for role in profile.target_roles %}
+          <span class="chip">{{ role }}</span>
+        {% endfor %}
+      </div>
+      <p class="muted mt-1">
+        Remote open: {{ profile.open_to_remote|yesno:"Yes,No" }}
+        {% if profile.min_salary_usd %} &middot; Min ${{ profile.min_salary_usd }}{% endif %}
+      </p>
+    {% else %}
+      <p class="muted">Review or customize your target roles, preferred locations, and salary expectations.</p>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

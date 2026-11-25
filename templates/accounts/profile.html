@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Preferences — SigmaFresher{% endblock %}
+
+{% block content %}
+<div class="grid-2">
+  <div class="card">
+    <h1>Search Preferences</h1>
+    <p class="muted">Refine your extracted target roles, locations, and salary floor.</p>
+
+    <form method="post" action="{% url 'accounts:profile' %}" class="mt-1">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            <div class="alert alert-error">{{ field.errors }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary">Save Preferences</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Privacy & Account Deletion</h2>
+    <p class="muted">
+      All uploaded resumes are stored privately. Deleting your account permanently removes your profile, saved data, and all uploaded resume files.
+    </p>
+    <form method="post" action="{% url 'accounts:delete_account' %}" class="mt-1">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Permanently Delete Account</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
