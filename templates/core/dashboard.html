@@ -18,7 +18,8 @@
       ({{ active_resume.get_parse_status_display }}) &middot; {{ resume_count }} uploaded
     </p>
     <div class="flex-gap mt-1">
-      <a class="btn btn-primary" href="{% url 'resumes:list' %}">Manage Resumes</a>
+      <a class="btn btn-primary" href="{% url 'jobs:search' %}">Search Matching Jobs</a>
+      <a class="btn btn-outline" href="{% url 'resumes:list' %}">Manage Resumes</a>
       <a class="btn btn-outline" href="{% url 'accounts:profile' %}">Edit Search Preferences</a>
     </div>
   {% endif %}

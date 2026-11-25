@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job.title }} — SigmaFresher{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="flex-between">
+    <div>
+      <h1>{{ job.title }}</h1>
+      <p class="muted">
+        <strong>{{ job.company_name }}</strong>
+        {% if job.location_text %} &middot; {{ job.location_text }}{% endif %}
+        &middot; {{ job.get_work_mode_display }}
+        &middot; Posted {{ job.posted_at|timesince }} ago
+      </p>
+    </div>
+    <div class="flex-gap">
+      {% if ranked and active_resume %}
+        <span class="badge badge-success">{{ ranked.match_percent }}% Match</span>
+      {% endif %}
+      <span class="badge">{{ job.source_name }}</span>
+      <span class="badge">{{ job.get_apply_url_type_display }}</span>
+    </div>
+  </div>
+
+  {% if job.salary_annual_min_usd or job.salary_annual_max_usd %}
+    <p class="muted mt-1">
+      Estimated Annual Salary (USD):
+      {% if job.salary_annual_min_usd %}${{ job.salary_annual_min_usd }}{% endif %}
+      {% if job.salary_annual_max_usd %} – ${{ job.salary_annual_max_usd }}{% endif %}
+    </p>
+  {% endif %}
+
+  {% if ranked and active_resume %}
+    <div class="mt-1">
+      {% if ranked.matched_skills %}
+        <div class="chips">
+          {% for skill in ranked.matched_skills %}
+            <span class="chip chip-match">+ {{ skill }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if ranked.missing_skills %}
+        <div class="chips">
+          {% for skill in ranked.missing_skills %}
+            <span class="chip chip-miss">Missing: {{ skill }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="flex-gap mt-1">
+    <a class="btn btn-primary"
+       href="{{ job.apply_url }}"
+       target="_blank"
+       rel="noopener noreferrer nofollow">Apply on {{ job.source_name }} &rarr;</a>
+    <a class="btn btn-outline" href="{% url 'jobs:search' %}">Back to Search</a>
+  </div>
+</div>
+
+<div class="card mt-1">
+  <h2>Job Description</h2>
+  {% if safe_description_html %}
+    <div>{{ safe_description_html|safe }}</div>
+  {% else %}
+    <p class="muted">{{ job.description_text|linebreaksbr }}</p>
+  {% endif %}
+</div>
+{% endblock %}

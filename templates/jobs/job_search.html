@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Find Jobs — SigmaFresher{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="flex-between">
+    <div>
+      <h1>Resume-Driven Job Search</h1>
+      {% if active_resume %}
+        <p class="muted">
+          Matching against: <strong>{{ active_resume.label|default:active_resume.original_filename }}</strong>
+          {% if active_resume.target_roles %}
+            &middot; Roles: {{ active_resume.target_roles|join:", " }}
+          {% endif %}
+        </p>
+      {% else %}
+        <p class="muted">
+          Upload and parse a resume to unlock personalized Match % scores.
+          <a href="{% url 'resumes:list' %}">Upload Resume</a>
+        </p>
+      {% endif %}
+    </div>
+
+    <form method="post"
+          action="{% url 'jobs:trigger_web_search' %}"
+          hx-post="{% url 'jobs:trigger_web_search' %}"
+          hx-target="#web-search-status"
+          hx-swap="outerHTML">
+      {% csrf_token %}
+      <input type="hidden" name="q" value="{{ request.GET.q|default:'' }}">
+      <input type="hidden" name="location" value="{{ request.GET.location|default:'' }}">
+      <button type="submit" class="btn btn-primary">Search Latest Across Web</button>
+    </form>
+  </div>
+
+  <div id="web-search-status" class="mt-1">
+    {% if latest_run %}
+      {% include "jobs/partials/search_run_status.html" with run=latest_run %}
+    {% endif %}
+  </div>
+</div>
+
+<div class="search-layout mt-1">
+  <aside class="card">
+    <h2>Filters</h2>
+    <form id="job-filter-form"
+          method="get"
+          action="{% url 'jobs:search' %}"
+          hx-get="{% url 'jobs:search' %}"
+          hx-target="#job-results"
+          hx-push-url="true"
+          hx-trigger="change, input delay:350ms from:input[type='text'], input delay:350ms from:input[type='number'], refreshJobs from:body">
+      {% if user_resumes %}
+        <div class="form-group">
+          <label for="id_resume">Active Resume</label>
+          <select name="resume" id="id_resume">
+            {% for r in user_resumes %}
+              <option value="{{ r.pk }}" {% if active_resume and r.pk == active_resume.pk %}selected{% endif %}>
+                {{ r.label|default:r.original_filename }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label for="id_sort">Sort By</label>
+        <select name="sort" id="id_sort">
+          <option value="best_match" {% if sort_mode == 'best_match' %}selected{% endif %}>Best Match (Fresh)</option>
+          <option value="most_recent" {% if sort_mode == 'most_recent' %}selected{% endif %}>Most Recent</option>
+          <option value="highest_salary" {% if sort_mode == 'highest_salary' %}selected{% endif %}>Highest Salary</option>
+        </select>
+      </div>
+
+      {% if active_resume %}
+        <div class="form-group">
+          <label for="id_min_match">Min Match %</label>
+          <input type="number" name="min_match" id="id_min_match" min="0" max="100" value="{{ min_match }}" placeholder="e.g. 50">
+        </div>
+      {% endif %}
+
+      {% for field in filter.form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+        </div>
+      {% endfor %}
+
+      <div class="flex-gap">
+        <button type="submit" class="btn btn-primary w-full">Apply Filters</button>
+        <a href="{% url 'jobs:search' %}" class="btn btn-outline w-full">Reset</a>
+      </div>
+    </form>
+  </aside>
+
+  <section id="job-results">
+    {% include "jobs/partials/job_results.html" %}
+  </section>
+</div>
+{% endblock %}

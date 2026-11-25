@@ -8,5 +8,6 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path("profile/", include("apps.accounts.urls")),
     path("resumes/", include("apps.resumes.urls")),
+    path("jobs/", include("apps.jobs.urls")),
     path("", include("apps.core.urls")),
 ]

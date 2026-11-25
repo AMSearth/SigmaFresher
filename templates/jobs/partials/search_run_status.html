@@ -1,0 +1,23 @@
+<div id="web-search-status" class="mt-1"
+     {% if run.status == 'pending' or run.status == 'running' %}
+     hx-get="{% url 'jobs:search_run_status' run.pk %}"
+     hx-trigger="every 2s"
+     hx-swap="outerHTML"
+     {% endif %}>
+  <div class="alert">
+    <strong>Web Search Status:</strong> {{ run.get_status_display }}
+    &middot; Query: <em>{{ run.query_text }}</em>
+    {% if run.jobs_found or run.jobs_created %}
+      &middot; Found {{ run.jobs_found }} ({{ run.jobs_created }} new)
+    {% endif %}
+    {% if run.source_telemetry %}
+      <div class="chips">
+        {% for source, info in run.source_telemetry.items %}
+          <span class="chip {% if info.status == 'ok' %}chip-match{% else %}chip-miss{% endif %}">
+            {{ source }}: {{ info.status }} ({{ info.count }})
+          </span>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</div>
