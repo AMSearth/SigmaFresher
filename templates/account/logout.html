@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Log out — SigmaFresher{% endblock %}
+
+{% block content %}
+<div class="card auth-card">
+  <h1>Sign out</h1>
+  <p class="muted">Are you sure you want to sign out?</p>
+  <form method="post" action="{% url 'account_logout' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Confirm sign out</button>
+  </form>
+</div>
+{% endblock %}

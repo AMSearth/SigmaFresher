@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Sign up — SigmaFresher{% endblock %}
+
+{% block content %}
+<div class="card auth-card">
+  <h1>Create your account</h1>
+  <p class="muted">Verify your email to start matching jobs to your resume.</p>
+
+  {% if form.non_field_errors %}
+    <div class="alert alert-error">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <form method="post" action="{% url 'account_signup' %}">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <div class="alert alert-error">{{ field.errors }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary" style="width: 100%;">Create account</button>
+  </form>
+
+  <p class="muted" style="margin-top: 1rem;">
+    Already have an account? <a href="{% url 'account_login' %}">Sign in</a>
+  </p>
+</div>
+{% endblock %}

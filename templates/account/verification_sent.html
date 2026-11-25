@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Verify your email — SigmaFresher{% endblock %}
+
+{% block content %}
+<div class="card auth-card">
+  <h1>Verify your email address</h1>
+  <p class="muted">
+    We sent a confirmation link to your email address. Click that link to activate your account and access job search.
+  </p>
+  <a class="btn btn-outline" href="{% url 'account_login' %}">Back to sign in</a>
+</div>
+{% endblock %}

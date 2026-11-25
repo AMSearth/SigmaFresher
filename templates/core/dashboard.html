@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — SigmaFresher{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h1>Welcome, {{ user.full_name|default:user.email }}</h1>
+  <p class="muted">
+    Your authenticated workspace is active. Upload your resume to unlock personalized matching across company career sites and job platforms.
+  </p>
+</div>
+
+<div class="grid-2" style="margin-top: 1.25rem;">
+  <div class="card">
+    <h2>1. Upload Your Resume</h2>
+    <p class="muted">PDF or DOCX up to 5 MB. Private encrypted storage with AI skill extraction (Phase 2).</p>
+  </div>
+  <div class="card">
+    <h2>2. Search Latest Web Jobs</h2>
+    <p class="muted">Direct company ATS boards, Adzuna, and open-web listings with direct apply links and filters (Phase 3–4).</p>
+  </div>
+</div>
+{% endblock %}
