@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.accounts",
     "apps.resumes",
+    "apps.jobs",
+    "apps.discovery",
 ]
 
 SITE_ID = 1
