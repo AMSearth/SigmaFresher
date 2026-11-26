@@ -4,6 +4,7 @@ from pathlib import Path
 
 import environ
 import structlog
+from celery.schedules import crontab
 from django.utils.csp import CSP
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     "apps.jobs",
     "apps.discovery",
     "apps.matching",
+    "apps.alerts",
 ]
 
 SITE_ID = 1
@@ -222,6 +224,20 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
+CELERY_BEAT_SCHEDULE = {
+    "sync-company-boards-every-6h": {
+        "task": "apps.discovery.tasks.sync_company_boards_task",
+        "schedule": crontab(minute=0, hour="*/6"),
+    },
+    "verify-job-links-daily": {
+        "task": "apps.discovery.tasks.verify_active_job_links_task",
+        "schedule": crontab(minute=30, hour=2),
+    },
+    "send-job-alerts-daily": {
+        "task": "apps.alerts.tasks.send_job_alerts_task",
+        "schedule": crontab(minute=0, hour=8),
+    },
+}
 
 # Cloud LLM & Discovery Config
 EMBEDDING_DIMENSIONS = 768

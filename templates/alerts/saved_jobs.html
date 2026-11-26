@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Saved Jobs — SigmaFresher{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="flex-between">
+    <h1>Saved & Applied Jobs</h1>
+    <div class="flex-gap">
+      <a class="btn btn-outline btn-sm" href="{% url 'alerts:saved_list' %}">All</a>
+      {% for val, label in status_choices %}
+        <a class="btn btn-outline btn-sm" href="?status={{ val }}">{{ label }}</a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% for item in saved_items %}
+  <div class="card mt-1">
+    <div class="flex-between">
+      <div>
+        <a class="job-title-link" href="{% url 'jobs:detail' item.job.pk %}">{{ item.job.title }}</a>
+        <div class="muted">
+          <strong>{{ item.job.company_name }}</strong>
+          &middot; {{ item.job.location_text|default:"Location not specified" }}
+          &middot; Status: <strong>{{ item.get_status_display }}</strong>
+          {% if item.applied_at %} &middot; Applied {{ item.applied_at|date:"Y-m-d" }}{% endif %}
+        </div>
+      </div>
+      <div class="flex-gap">
+        <a class="btn btn-primary btn-sm"
+           href="{{ item.job.apply_url }}"
+           target="_blank"
+           rel="noopener noreferrer nofollow">Apply &rarr;</a>
+        <form method="post" action="{% url 'alerts:delete_saved' item.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+        </form>
+      </div>
+    </div>
+
+    <form method="post" action="{% url 'alerts:update_saved' item.pk %}" class="mt-1">
+      {% csrf_token %}
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="status-{{ item.pk }}">Application Status</label>
+          <select name="status" id="status-{{ item.pk }}">
+            {% for val, label in status_choices %}
+              <option value="{{ val }}" {% if item.status == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="notes-{{ item.pk }}">Notes</label>
+          <input type="text" name="notes" id="notes-{{ item.pk }}" value="{{ item.notes }}" placeholder="Recruiter, interview stage...">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-outline btn-sm">Update Tracker</button>
+    </form>
+  </div>
+{% empty %}
+  <div class="card mt-1">
+    <p class="muted">No saved jobs yet. Browse <a href="{% url 'jobs:search' %}">Find Jobs</a> to bookmark roles.</p>
+  </div>
+{% endfor %}
+{% endblock %}

@@ -16,6 +16,8 @@
         <a class="nav-link" href="{% url 'core:dashboard' %}">Dashboard</a>
         <a class="nav-link" href="{% url 'jobs:search' %}">Find Jobs</a>
         <a class="nav-link" href="{% url 'resumes:list' %}">Resumes</a>
+        <a class="nav-link" href="{% url 'alerts:saved_list' %}">Saved Jobs</a>
+        <a class="nav-link" href="{% url 'alerts:alerts_list' %}">Alerts</a>
         <a class="nav-link" href="{% url 'accounts:profile' %}">Preferences</a>
         <span class="muted">{{ user.email }}</span>
         <form method="post" action="{% url 'account_logout' %}">

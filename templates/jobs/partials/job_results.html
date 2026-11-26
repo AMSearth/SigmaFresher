@@ -54,6 +54,10 @@
          target="_blank"
          rel="noopener noreferrer nofollow">Apply &rarr;</a>
       <a class="btn btn-outline btn-sm" href="{% url 'jobs:detail' item.job.pk %}">View Details</a>
+      <form method="post" action="{% url 'alerts:save_job' item.job.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline btn-sm">Save</button>
+      </form>
     </div>
   </article>
 {% empty %}

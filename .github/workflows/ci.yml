@@ -1,0 +1,48 @@
+name: CI & Security Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_DB: sigma_test
+          POSTGRES_USER: sigma
+          POSTGRES_PASSWORD: sigma_test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: uv sync --frozen
+      - name: Lint with Ruff
+        run: uv run ruff check .
+      - name: Type-check with Mypy
+        run: uv run mypy apps config
+      - name: Security scan with Bandit
+        run: uv run bandit -c pyproject.toml -r apps config
+      - name: Run migrations & pytest against pgvector Postgres
+        env:
+          TEST_DATABASE_URL: postgres://sigma:sigma_test_password@localhost:5432/sigma_test
+        run: |
+          uv run python manage.py migrate --settings=config.settings.test
+          uv run pytest
+      - name: Audit dependencies
+        run: uv run pip-audit

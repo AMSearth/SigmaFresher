@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Job Alerts — SigmaFresher{% endblock %}
+
+{% block content %}
+<div class="grid-2">
+  <div class="card">
+    <h1>Create Job Alert</h1>
+    <p class="muted">Receive daily or weekly email digests of fresh resume-matched jobs.</p>
+
+    <form method="post" action="{% url 'alerts:alerts_list' %}" class="mt-1">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            <div class="alert alert-error">{{ field.errors }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary w-full">Create Alert</button>
+    </form>
+  </div>
+
+  <div>
+    <h2>Your Alerts</h2>
+    {% for alert in alerts %}
+      <div class="card mt-1">
+        <div class="flex-between">
+          <div>
+            <strong>{{ alert.name }}</strong>
+            <div class="muted">
+              {{ alert.get_frequency_display }}
+              {% if alert.query_text %} &middot; {{ alert.query_text }}{% endif %}
+              {% if alert.location %} &middot; {{ alert.location }}{% endif %}
+            </div>
+          </div>
+          <span class="badge {% if alert.is_active %}badge-success{% else %}badge-warn{% endif %}">
+            {{ alert.is_active|yesno:"Active,Paused" }}
+          </span>
+        </div>
+        <div class="flex-gap mt-1">
+          <form method="post" action="{% url 'alerts:toggle_alert' alert.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline btn-sm">
+              {{ alert.is_active|yesno:"Pause,Resume" }}
+            </button>
+          </form>
+          <form method="post" action="{% url 'alerts:delete_alert' alert.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+          </form>
+        </div>
+      </div>
+    {% empty %}
+      <div class="card mt-1">
+        <p class="muted">No job alerts configured yet.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

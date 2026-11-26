@@ -55,6 +55,10 @@
        href="{{ job.apply_url }}"
        target="_blank"
        rel="noopener noreferrer nofollow">Apply on {{ job.source_name }} &rarr;</a>
+    <form method="post" action="{% url 'alerts:save_job' job.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline">Save Job</button>
+    </form>
     <a class="btn btn-outline" href="{% url 'jobs:search' %}">Back to Search</a>
   </div>
 </div>
